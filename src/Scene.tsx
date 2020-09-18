@@ -9,7 +9,7 @@ export interface SceneProps {}
 const Scene: FC<SceneProps> = ({}) => {
   return (
     <Canvas className={styles.scene}>
-      <Cube position={[1, 1, 1]} />
+      <Cube position={[0, 0, 0]} />
       <pointLight position={[10, 10, 10]} />
       <PerspectiveCamera makeDefault position={[0, 0, 10]} />
       <OrbitControls />
