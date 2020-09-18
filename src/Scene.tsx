@@ -1,15 +1,20 @@
 import { OrbitControls, PerspectiveCamera, Plane } from 'drei';
-import React, { FC } from 'react';
+import React, { FC, Suspense } from 'react';
 import { Canvas } from 'react-three-fiber';
 import MarchingCubes from './meshes/MarchingCubes';
 import styles from './Scene.module.css';
 
 export interface SceneProps {}
 
+const size = 16;
+const field = new Float32Array(size * size * size);
+
 const Scene: FC<SceneProps> = () => {
   return (
     <Canvas className={styles.scene}>
-      <MarchingCubes />
+      <Suspense fallback={null}>
+        <MarchingCubes size={size} field={field} />
+      </Suspense>
       <Plane
         position={[0, -5, 0]}
         args={[100, 100]}

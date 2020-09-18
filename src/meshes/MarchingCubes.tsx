@@ -1,24 +1,26 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
-import { BufferGeometry, Group } from 'three';
+import React, { FC, useRef } from 'react';
+import { Group } from 'three';
 import generateVoxelGeometry from '../cubes/generateVoxelGeometry';
+import usePromise from 'react-promise-suspense';
 import { generatePerlinVoxelField } from '../cubes/noise';
 
-export interface MarchingCubesProps {}
+export interface MarchingCubesProps {
+  field: Float32Array;
+  size: number;
+}
 
-const MarchingCubes: FC<MarchingCubesProps> = () => {
+const MarchingCubes: FC<MarchingCubesProps> = (props) => {
   const ref = useRef<Group>();
-  const [geometry, setGeometry] = useState<BufferGeometry | undefined>(
-    undefined,
-  );
 
-  useEffect(() => {
-    const size = 16;
-    const field = new Float32Array(size * size * size);
-    generatePerlinVoxelField(field, size);
-    generateVoxelGeometry({ size, field }).then(({ geometry }) => {
-      setGeometry(geometry);
-    });
-  }, []);
+  const geometry = usePromise(
+    (field, size) => {
+      generatePerlinVoxelField(field, size);
+      return generateVoxelGeometry({ size, field }).then(({ geometry }) => {
+        return geometry;
+      });
+    },
+    [props.field, props.size],
+  );
 
   return (
     <group ref={ref}>
