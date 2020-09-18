@@ -1,5 +1,4 @@
 import cubesValues from './cubesValues';
-import { generatePerlinVoxelField } from './noise';
 import { CubeWorkerInput, CubeWorkerResult } from './types';
 
 // Essentially copied from https://github.com/mrdoob/three.js/blob/dev/examples/jsm/objects/MarchingCubes.js

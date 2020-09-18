@@ -1,4 +1,4 @@
-import { OrbitControls, PerspectiveCamera, Plane, RoundedBox } from 'drei';
+import { OrbitControls, PerspectiveCamera, Plane } from 'drei';
 import React, { FC } from 'react';
 import { Canvas } from 'react-three-fiber';
 import MarchingCubes from './meshes/MarchingCubes';
@@ -6,7 +6,7 @@ import styles from './Scene.module.css';
 
 export interface SceneProps {}
 
-const Scene: FC<SceneProps> = ({}) => {
+const Scene: FC<SceneProps> = () => {
   return (
     <Canvas className={styles.scene}>
       <MarchingCubes />

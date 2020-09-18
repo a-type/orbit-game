@@ -5,7 +5,7 @@ import { generatePerlinVoxelField } from '../cubes/noise';
 
 export interface MarchingCubesProps {}
 
-const MarchingCubes: FC<MarchingCubesProps> = ({}) => {
+const MarchingCubes: FC<MarchingCubesProps> = () => {
   const ref = useRef<Group>();
   const [geometry, setGeometry] = useState<BufferGeometry | undefined>(
     undefined,

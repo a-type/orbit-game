@@ -1,11 +1,11 @@
-import random from 'seedrandom';
+// import random from 'seedrandom';
 // @ts-ignore
 import tumult from 'tumult';
 import { setValue } from './voxelField';
 
 const noiseSize = 4;
 const seed = 'seed' + Math.random() * 100000;
-const rand = random(seed);
+// const rand = random(seed);
 const noiseDampening = 0;
 
 export function generatePerlinVoxelField(field: Float32Array, size: number) {
