@@ -1,11 +1,4 @@
-const WorkerPlugin = require("worker-plugin");
+const WorkerPlugin = require('worker-plugin');
+const { addWebpackPlugin, override } = require('customize-cra');
 
-module.exports = function override(config, env) {
-  if (!config.plugins) {
-    config.plugins = [];
-  }
-
-  config.plugins.push(new WorkerPlugin());
-
-  return config;
-};
+module.exports = override(addWebpackPlugin(new WorkerPlugin()));

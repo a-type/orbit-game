@@ -9,7 +9,9 @@ const context = self; // eslint-disable-line no-restricted-globals
 
 context.addEventListener('message', function (ev) {
   console.log('Worker started');
-  const { size, field } = ev.data as CubeWorkerInput;
+  const { field } = ev.data as CubeWorkerInput;
+  // the raw size of the vector field
+  const size = Math.cbrt(field.length);
 
   // temp buffers used to polygonize
   const vertexList = new Float32Array(12 * 3);
@@ -477,52 +479,13 @@ context.addEventListener('message', function (ev) {
     count += 3;
   }
 
-  function blur(intensity: number = 1) {
-    const fieldCopy = field.slice();
-    for (let x = 0; x < size; x++) {
-      for (let y = 0; y < size; y++) {
-        for (let z = 0; z < size; z++) {
-          const index = size2 * z + size * y + x;
-          let val = fieldCopy[index];
-          let c = 1;
-
-          for (let x2 = -1; x2 <= 1; x2 += 2) {
-            const x3 = x2 + x;
-            if (x3 < 0 || x3 >= size) continue;
-
-            for (let y2 = -1; y2 <= 1; y2 += 2) {
-              const y3 = y2 + y;
-              if (y3 < 0 || y3 >= size) continue;
-
-              for (let z2 = -1; z2 <= 1; z2 += 2) {
-                const z3 = z2 + z;
-                if (z3 < 0 || z3 >= size) continue;
-
-                const index2 = size2 * z3 + size * y3 + x3;
-                const val2 = fieldCopy[index2];
-
-                c++;
-                val += (intensity * (val2 - val)) / c;
-              }
-            }
-          }
-
-          field[index] = val;
-        }
-      }
-    }
-  }
-
-  function generate(data: CubeWorkerInput) {
-    blur();
-
-    // starting at -1 closes up the bottom of the mesh!
-    const startValue = 1;
-    const endValue = size - 2;
+  function generate() {
+    const startValue = 0;
+    const endValue = size - 1;
     for (let z = startValue; z < endValue; z++) {
       const zOffset = size2 * z;
       const fz = (z - halfSize) / halfSize;
-      for (let y = startValue - 2; y < endValue; y++) {
+      for (let y = startValue; y < endValue; y++) {
         const yOffset = zOffset + size * y;
         const fy = (y - halfSize) / halfSize;
         for (let x = startValue; x < endValue; x++) {
@@ -550,5 +513,5 @@ context.addEventListener('message', function (ev) {
     (context as any).postMessage(result);
   }
 
-  generate(ev.data);
+  generate();
 });

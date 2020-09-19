@@ -1,6 +1,5 @@
 export type CubeWorkerInput = {
   field: Float32Array;
-  size: number;
 };
 
 export type CubeWorkerResult = {
