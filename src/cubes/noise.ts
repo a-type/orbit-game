@@ -44,22 +44,16 @@ export function generateStrata(
     py = 0,
     pz = 0;
   for (px = 0; px <= size; px++) {
-    const x = Math.floor(py + offset.x);
     for (py = 0; py <= size; py++) {
       const y = Math.floor(py + offset.y);
       for (pz = 0; pz <= size; pz++) {
-        const z = Math.floor(pz + offset.z);
         setValue(field, size, px, py, pz, y % 4 === 0 ? 1 : 0);
       }
     }
   }
 }
 
-export function generateCubes(
-  field: Float32Array,
-  size: number,
-  offset: Vector3 = new Vector3(0, 0, 0),
-) {
+export function generateCubes(field: Float32Array, size: number) {
   let px = 1,
     py = 1,
     pz = 1;
@@ -72,11 +66,7 @@ export function generateCubes(
   }
 }
 
-export function generateAxes(
-  field: Float32Array,
-  size: number,
-  offset: Vector3 = new Vector3(0, 0, 0),
-) {
+export function generateAxes(field: Float32Array, size: number) {
   let px = 0,
     py = 0,
     pz = 0;

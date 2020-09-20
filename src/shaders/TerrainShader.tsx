@@ -1,35 +1,23 @@
 import React, { useContext, useMemo } from 'react';
-import { Vector3, Color, UniformsLib, UniformsUtils } from 'three';
+import { Vector3, Color, UniformsUtils } from 'three';
 import { LightsContext } from '../contexts/lights';
 
 export const TerrainShader = {
   uniforms: UniformsUtils.merge([
-    UniformsLib.lights,
-    UniformsLib.fog,
     {
-      uDirLightPos: { value: new Vector3() },
-      uDirLightColor: { value: new Color(0xeeeeee) },
-      ambientLightColor: { value: new Color(0x050505) },
-      uBaseColor: { value: new Color(0xffffff) },
-      uLineColor1: { value: new Color(0xa0a0a0) },
-      uLineColor2: { value: new Color(0x0000a0) },
+      LightPosition: { value: new Vector3() },
     },
   ]),
 
   vertexShader: `
-  #include <common>
-  #include <fog_pars_vertex>
-  #include <shadowmap_pars_vertex>
-  varying vec3 vNormal;
-  varying vec3 vWorldPosition;
-  void main() {
-    #include <begin_vertex>
-    #include <project_vertex>
-    #include <worldpos_vertex>
-    #include <shadowmap_vertex>
-    #include <fog_vertex>
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    vNormal = normalize(normalMatrix * normal);
+  varying vec3 Normal;
+  void main(void)
+  {
+    Normal = normalize(gl_NormalMatrix * gl_Normal)
+    #ifdef __GLSL_CG_DATA_TYPES // Fix clipping for Nvidia and ATI
+    gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
+    #endif
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
   }
   `,
 
@@ -78,35 +66,21 @@ export const TerrainShaderMaterial = function ({
   shadeColor2,
   ...rest
 }: TerrainShaderMaterialProps) {
-  const { pointLightPosition, pointLightColor, ambientLightColor } = useContext(
-    LightsContext,
-  );
+  const { pointLightPosition } = useContext(LightsContext);
 
   const shaderArgs = useMemo(
     () => ({
-      fog: true,
-      lights: true,
-      dithering: true,
+      // fog: true,
+      // lights: true,
+      // dithering: true,
       uniforms: {
         ...TerrainShader.uniforms,
-        uDirLightPos: { value: pointLightPosition },
-        uDirLightColor: { value: pointLightColor },
-        ambientLightColor: { value: ambientLightColor },
-        uBaseColor: { value: baseColor || new Color('#ffcb8e') },
-        uLineColor1: { value: shadeColor1 || new Color('#e97171') },
-        uLineColor2: { value: shadeColor2 || new Color('#931a25') },
+        LightPosition: { value: pointLightPosition },
       },
       vertexShader: TerrainShader.vertexShader,
       fragmentShader: TerrainShader.fragmentShader,
     }),
-    [
-      pointLightColor,
-      pointLightPosition,
-      ambientLightColor,
-      baseColor,
-      shadeColor1,
-      shadeColor2,
-    ],
+    [pointLightPosition],
   );
 
   return <shaderMaterial args={[shaderArgs]} {...rest} />;

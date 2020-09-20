@@ -1,4 +1,3 @@
-import { Vector3 } from 'three';
 import { setValue } from '../cubes/voxelField';
 import n from 'noisejs';
 
@@ -7,13 +6,18 @@ const noiseScale3d = 1 / 16;
 const absoluteCeiling = 8;
 const heightmapScale = 72;
 const heightmapHilliness = 16;
-const heightmapFloor = -40;
+const heightmapFloor = -80;
 const structureScale = 50;
 const structureMultiplier = 150;
 const structureCeilingScale = 30;
 const structureCeilingMultiplier = 30;
 const structureCeilingOffset = 20;
 const structureMaskScale = 80;
+const highgroundCeilingScale = 50;
+const highgroundCeilingMultiplier = 300;
+const highgroundCeilingOffset = 40;
+const highgroundMaskScale = 120;
+const highgroundExponent = 1.2;
 
 const blocky = true;
 
@@ -25,30 +29,66 @@ function postProcess(value: number) {
   return value;
 }
 
-function getStructureCeilingValue(x: number, y: number) {
-  return (
-    postProcess(
-      noise.perlin2(
-        x / structureCeilingScale + 1,
-        y / structureCeilingScale + 1,
-      ) * structureCeilingMultiplier,
-    ) + structureCeilingOffset
+function getMaskedHeightmapValue(
+  x: number,
+  y: number,
+  z: number,
+  {
+    scale,
+    multiplier,
+    offset,
+    maskScale,
+    exponent = 1,
+  }: {
+    scale: number;
+    multiplier: number;
+    offset: number;
+    maskScale: number;
+    exponent?: number;
+  },
+) {
+  const rawValue = Math.pow(
+    postProcess(noise.perlin2(x / scale + 1, z / scale + 1) * multiplier) +
+      offset,
+    exponent,
   );
+
+  const mask2d = Math.max(
+    0,
+    noise.perlin2(x / maskScale, z / maskScale) * rawValue - y,
+  );
+
+  return rawValue * mask2d;
+}
+
+function getStructureCeilingValue(x: number, y: number, z: number) {
+  return getMaskedHeightmapValue(x, y, z, {
+    scale: structureCeilingScale,
+    multiplier: structureCeilingMultiplier,
+    offset: structureCeilingOffset,
+    maskScale: structureMaskScale,
+  });
+}
+
+function getHighgroundValue(x: number, y: number, z: number) {
+  return getMaskedHeightmapValue(x, y, z, {
+    scale: highgroundCeilingScale,
+    multiplier: highgroundCeilingMultiplier,
+    offset: highgroundCeilingOffset,
+    maskScale: highgroundMaskScale,
+    exponent: highgroundExponent,
+  });
 }
 
 function getStructureValue(x: number, y: number, z: number) {
   const rawValue =
     noise.perlin3(x / structureScale, y / structureScale, z / structureScale) *
     structureMultiplier;
-  const ceilingValue = getStructureCeilingValue(x, z);
-  const mask2d = Math.max(
-    0,
-    noise.perlin2(x / structureMaskScale, z / structureMaskScale) *
-      ceilingValue -
-      y,
-  );
+  const structureCeilingValue = getStructureCeilingValue(x, y, z);
+  const highgroundValue = getHighgroundValue(x, y, z);
+  const ceilingValue = Math.max(structureCeilingValue, highgroundValue);
   if (y > ceilingValue) return 0;
-  return rawValue * Math.pow(mask2d, 2);
+  return rawValue;
 }
 
 function getHeightmapValue(x: number, y: number) {
@@ -75,7 +115,7 @@ function getTerrainValue(x: number, y: number, z: number) {
 
 export function generateTerrainVoxels(
   size: number,
-  offset: Vector3 = new Vector3(0, 0, 0),
+  offset: [number, number, number] = [0, 0, 0],
 ) {
   const field = new Float32Array(Math.pow(size, 3));
 
@@ -83,11 +123,11 @@ export function generateTerrainVoxels(
     py = 0,
     pz = 0;
   for (px = 0; px <= size; px++) {
-    const x = Math.floor(px + offset.x);
+    const x = Math.floor(px + offset[0]);
     for (py = 0; py <= size; py++) {
-      const y = Math.floor(py + offset.y);
+      const y = Math.floor(py + offset[1]);
       for (pz = 0; pz <= size; pz++) {
-        const z = Math.floor(pz + offset.z);
+        const z = Math.floor(pz + offset[2]);
         setValue(field, size, px, py, pz, getTerrainValue(x, y, z));
       }
     }
@@ -99,7 +139,7 @@ export function generateTerrainVoxels(
 // saved for future use - very thin and winding terrain
 export function generateInterestingFeatures(
   size: number,
-  offset: Vector3 = new Vector3(0, 0, 0),
+  offset: [number, number, number] = [0, 0, 0],
 ) {
   const field = new Float32Array(Math.pow(size, 3));
 
@@ -107,11 +147,11 @@ export function generateInterestingFeatures(
     py = 0,
     pz = 0;
   for (px = 0; px <= size; px++) {
-    const x = Math.floor(px + offset.x);
+    const x = Math.floor(px + offset[0]);
     for (py = 0; py <= size; py++) {
-      const y = Math.floor(py + offset.y);
+      const y = Math.floor(py + offset[1]);
       for (pz = 0; pz <= size; pz++) {
-        const z = Math.floor(pz + offset.z);
+        const z = Math.floor(pz + offset[2]);
 
         const value3d = Math.max(
           0,

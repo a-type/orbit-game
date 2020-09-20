@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Vector3 } from 'three';
-import { generateTerrainVoxels } from '../generation/terrain';
-import { TerrainShaderMaterial } from '../shaders/TerrainShader';
+import { MeshToonMaterial, Vector3 } from 'three';
+import { generateTerrain } from '../generation/generateTerrain';
 import {
   ChunkCoordinate,
   MarchingCubes,
@@ -13,11 +12,23 @@ export type TerrainProps = {
   renderDistance: number;
 };
 
-function generateChunk(coord: ChunkCoordinate) {
+async function generateChunk(coord: ChunkCoordinate) {
   const adjustedSize = coord.size + 1;
-  const field = generateTerrainVoxels(adjustedSize, coord.worldCoordinate);
-  return Promise.resolve(field);
+  const offset: [number, number, number] = [
+    coord.worldCoordinate.x,
+    coord.worldCoordinate.y,
+    coord.worldCoordinate.z,
+  ];
+  const { field } = await generateTerrain({
+    size: adjustedSize,
+    offset,
+  });
+  return field;
 }
+
+const chunkMaterial = new MeshToonMaterial({
+  color: 'brown',
+});
 
 export function Terrain(props: TerrainProps) {
   return (
@@ -32,9 +43,8 @@ export function Terrain(props: TerrainProps) {
             key={chunk.key}
             coordinate={chunk}
             generate={generateChunk}
-          >
-            <TerrainShaderMaterial attach="material" />
-          </MarchingCubesChunk>
+            material={chunkMaterial}
+          />
         ))
       }
     </MarchingCubes>

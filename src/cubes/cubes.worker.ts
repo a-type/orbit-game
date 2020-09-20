@@ -8,7 +8,6 @@ import { CubeWorkerInput, CubeWorkerResult } from './types';
 const context = self; // eslint-disable-line no-restricted-globals
 
 context.addEventListener('message', function (ev) {
-  console.log('Worker started');
   const { field } = ev.data as CubeWorkerInput;
   // the raw size of the vector field
   const size = Math.cbrt(field.length);
@@ -509,7 +508,6 @@ context.addEventListener('message', function (ev) {
       count,
     };
 
-    console.log('Worker finished');
     (context as any).postMessage(result);
   }
 

@@ -1,12 +1,12 @@
-import React, { ReactElement, ReactNode, Suspense, useMemo } from 'react';
-import { Vector3 } from 'three';
+import React, { ReactNode, Suspense, useMemo } from 'react';
+import { Material, Vector3 } from 'three';
 import generateVoxelGeometry from '../cubes/generateVoxelGeometry';
 import usePromise from 'react-promise-suspense';
 
 export type MarchingCubesChunkProps = {
   coordinate: ChunkCoordinate;
   generate: (coordinate: ChunkCoordinate) => Promise<Float32Array>;
-  children?: ReactElement;
+  material?: Material;
 };
 
 export function MarchingCubesChunk(props: MarchingCubesChunkProps) {
@@ -25,7 +25,11 @@ function getChunkPosition(coordinate: ChunkCoordinate) {
   );
 }
 
-function MarchingCubesChunkMesh(props: MarchingCubesChunkProps) {
+function MarchingCubesChunkMesh({
+  coordinate,
+  generate,
+  ...rest
+}: MarchingCubesChunkProps) {
   const geometry = usePromise(
     async (
       coordinate: ChunkCoordinate,
@@ -37,26 +41,29 @@ function MarchingCubesChunkMesh(props: MarchingCubesChunkProps) {
       });
       return geometry;
     },
-    [props.coordinate, props.generate],
+    [coordinate, generate],
+  );
+
+  const chunkSize = coordinate.size;
+  const scale = useMemo(
+    () =>
+      new Vector3(
+        0.5 + chunkSize / 2,
+        0.5 + chunkSize / 2,
+        0.5 + chunkSize / 2,
+      ),
+    [chunkSize],
   );
 
   return (
     <mesh
       geometry={geometry}
-      position={getChunkPosition(props.coordinate)}
+      position={getChunkPosition(coordinate)}
       castShadow
       receiveShadow
-      scale={
-        // todo: figure out why scale hack is necessary with 0.5 thing
-        new Vector3(
-          0.5 + props.coordinate.size / 2,
-          0.5 + props.coordinate.size / 2,
-          0.5 + props.coordinate.size / 2,
-        )
-      }
-    >
-      {props.children}
-    </mesh>
+      scale={scale}
+      {...rest}
+    />
   );
 }
 
