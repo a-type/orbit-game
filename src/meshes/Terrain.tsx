@@ -28,12 +28,13 @@ async function generateChunk(coord: ChunkCoordinate) {
 
 const chunkMaterial = new MeshToonMaterial({
   color: 'brown',
+  wireframe: false,
 });
 
 export function Terrain(props: TerrainProps) {
   return (
     <MarchingCubes
-      chunkSize={64}
+      chunkSize={32}
       viewPosition={props.viewPosition}
       renderDistance={props.renderDistance}
     >

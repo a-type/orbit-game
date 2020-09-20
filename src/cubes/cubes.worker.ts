@@ -19,6 +19,7 @@ context.addEventListener('message', function (ev) {
 
   const enableUvs = false;
   const enableColors = false;
+  const enableNormals = false;
 
   const size2 = size * size;
   const size3 = size2 * size;
@@ -425,30 +426,32 @@ context.addEventListener('message', function (ev) {
     positionArray[c + 8] = pos[o3 + 2];
 
     // normals
-    if (flatShading) {
-      const nx = (norm[o1 + 0] + norm[o2 + 0] + norm[o3 + 0]) / 3;
-      const ny = (norm[o1 + 1] + norm[o2 + 1] + norm[o3 + 1]) / 3;
-      const nz = (norm[o1 + 2] + norm[o2 + 2] + norm[o3 + 2]) / 3;
+    if (enableNormals) {
+      if (flatShading) {
+        const nx = (norm[o1 + 0] + norm[o2 + 0] + norm[o3 + 0]) / 3;
+        const ny = (norm[o1 + 1] + norm[o2 + 1] + norm[o3 + 1]) / 3;
+        const nz = (norm[o1 + 2] + norm[o2 + 2] + norm[o3 + 2]) / 3;
 
-      normalArray[c + 0] = nx;
-      normalArray[c + 1] = ny;
-      normalArray[c + 2] = nz;
-      normalArray[c + 3] = nx;
-      normalArray[c + 4] = ny;
-      normalArray[c + 5] = nz;
-      normalArray[c + 6] = nx;
-      normalArray[c + 7] = ny;
-      normalArray[c + 8] = nz;
-    } else {
-      normalArray[c + 0] = norm[o1 + 0];
-      normalArray[c + 1] = norm[o1 + 1];
-      normalArray[c + 2] = norm[o1 + 2];
-      normalArray[c + 3] = norm[o2 + 0];
-      normalArray[c + 4] = norm[o2 + 1];
-      normalArray[c + 5] = norm[o2 + 2];
-      normalArray[c + 6] = norm[o3 + 0];
-      normalArray[c + 7] = norm[o3 + 1];
-      normalArray[c + 8] = norm[o3 + 2];
+        normalArray[c + 0] = nx;
+        normalArray[c + 1] = ny;
+        normalArray[c + 2] = nz;
+        normalArray[c + 3] = nx;
+        normalArray[c + 4] = ny;
+        normalArray[c + 5] = nz;
+        normalArray[c + 6] = nx;
+        normalArray[c + 7] = ny;
+        normalArray[c + 8] = nz;
+      } else {
+        normalArray[c + 0] = norm[o1 + 0];
+        normalArray[c + 1] = norm[o1 + 1];
+        normalArray[c + 2] = norm[o1 + 2];
+        normalArray[c + 3] = norm[o2 + 0];
+        normalArray[c + 4] = norm[o2 + 1];
+        normalArray[c + 5] = norm[o2 + 2];
+        normalArray[c + 6] = norm[o3 + 0];
+        normalArray[c + 7] = norm[o3 + 1];
+        normalArray[c + 8] = norm[o3 + 2];
+      }
     }
 
     // uvs
@@ -499,7 +502,7 @@ context.addEventListener('message', function (ev) {
     const result: CubeWorkerResult = {
       hasPositions: true,
       positionArray,
-      hasNormals: true,
+      hasNormals: enableNormals,
       normalArray,
       hasColors: enableColors,
       colorArray,

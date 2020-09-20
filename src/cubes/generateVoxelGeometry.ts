@@ -41,6 +41,8 @@ export default (chunkData: CubeWorkerInput) => {
           data.count * 3,
         );
         geometry.setAttribute('normal', new BufferAttribute(normalArray, 3));
+      } else {
+        geometry.computeVertexNormals();
       }
       if (data.hasColors) {
         colorArray = concatenate(colorArray, data.colorArray, data.count * 3);
@@ -51,9 +53,6 @@ export default (chunkData: CubeWorkerInput) => {
         geometry.setAttribute('uv', new BufferAttribute(uvArray, 2));
       }
 
-      // this actually screws up our perfectly good normals from
-      // generation!
-      // geometry.computeVertexNormals();
       // seems to have issues.
       //geometry.computeBoundingSphere();
 
