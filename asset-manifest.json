@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/orbit-game/static/css/main.af68538f.chunk.css",
+    "main.js": "/orbit-game/static/js/main.4411c679.chunk.js",
+    "main.js.map": "/orbit-game/static/js/main.4411c679.chunk.js.map",
+    "runtime-main.js": "/orbit-game/static/js/runtime-main.cda06ebc.js",
+    "runtime-main.js.map": "/orbit-game/static/js/runtime-main.cda06ebc.js.map",
+    "static/js/2.c7b3db15.chunk.js": "/orbit-game/static/js/2.c7b3db15.chunk.js",
+    "static/js/2.c7b3db15.chunk.js.map": "/orbit-game/static/js/2.c7b3db15.chunk.js.map",
+    "index.html": "/orbit-game/index.html",
+    "precache-manifest.ed338331e38c79b3a7e6c2473acc312d.js": "/orbit-game/precache-manifest.ed338331e38c79b3a7e6c2473acc312d.js",
+    "service-worker.js": "/orbit-game/service-worker.js",
+    "static/css/main.af68538f.chunk.css.map": "/orbit-game/static/css/main.af68538f.chunk.css.map",
+    "static/js/2.c7b3db15.chunk.js.LICENSE.txt": "/orbit-game/static/js/2.c7b3db15.chunk.js.LICENSE.txt",
+    "static/js/CubeWorker.8771c507.chunk.worker.js": "/orbit-game/static/js/CubeWorker.8771c507.chunk.worker.js",
+    "static/js/CubeWorker.8771c507.chunk.worker.js.map": "/orbit-game/static/js/CubeWorker.8771c507.chunk.worker.js.map",
+    "static/js/NoiseWorker.af6f2b86.chunk.worker.js": "/orbit-game/static/js/NoiseWorker.af6f2b86.chunk.worker.js",
+    "static/js/NoiseWorker.af6f2b86.chunk.worker.js.map": "/orbit-game/static/js/NoiseWorker.af6f2b86.chunk.worker.js.map"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.cda06ebc.js",
+    "static/js/2.c7b3db15.chunk.js",
+    "static/css/main.af68538f.chunk.css",
+    "static/js/main.4411c679.chunk.js"
+  ]
+}
