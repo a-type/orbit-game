@@ -4,7 +4,6 @@ import { Canvas } from 'react-three-fiber';
 import { Mesh, Vector3 } from 'three';
 import { Physics } from 'use-cannon';
 import { Effects } from './effects/Effects';
-import { FollowCamera } from './entities/FollowCamera';
 import { Ocean } from './entities/Ocean';
 import { Player } from './entities/Player';
 import { Terrain } from './entities/Terrain';
