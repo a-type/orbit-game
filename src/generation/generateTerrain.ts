@@ -1,10 +1,8 @@
 import { NoiseWorkerInput, NoiseWorkerResult } from './types';
+import NoiseWorker from './noise.worker';
 
 export function generateTerrain(input: NoiseWorkerInput) {
-  const worker = new Worker('./noise.worker', {
-    name: 'NoiseWorker',
-    type: 'module',
-  });
+  const worker: Worker = new NoiseWorker();
 
   return new Promise<{ field: Float32Array }>((resolve, reject) => {
     worker.addEventListener('message', (ev) => {

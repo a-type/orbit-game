@@ -1,7 +1,8 @@
 import React, { ReactNode, Suspense, useMemo } from 'react';
-import { Material, Vector3 } from 'three';
+import { BufferGeometry, Geometry, Material, Vector3 } from 'three';
 import generateVoxelGeometry from '../cubes/generateVoxelGeometry';
 import usePromise from 'react-promise-suspense';
+import { useTrimesh } from 'use-cannon';
 
 export type MarchingCubesChunkProps = {
   coordinate: ChunkCoordinate;
@@ -18,11 +19,33 @@ export function MarchingCubesChunk(props: MarchingCubesChunkProps) {
 }
 
 function getChunkPosition(coordinate: ChunkCoordinate) {
-  return new Vector3(
+  return [
     coordinate.x * coordinate.size,
     coordinate.y * coordinate.size,
     coordinate.z * coordinate.size,
-  );
+  ];
+}
+
+function toCannonStuff(geometry: BufferGeometry, scale: number) {
+  const geo = new Geometry().fromBufferGeometry(geometry);
+  const vertices = [];
+  const indices = [];
+
+  for (const vert of geo.vertices) {
+    vertices.push(vert.x * scale);
+    vertices.push(vert.y * scale);
+    vertices.push(vert.z * scale);
+  }
+  for (const face of geo.faces) {
+    indices.push(face.a);
+    indices.push(face.b);
+    indices.push(face.c);
+  }
+
+  return {
+    vertices,
+    indices,
+  };
 }
 
 function MarchingCubesChunkMesh({
@@ -30,21 +53,36 @@ function MarchingCubesChunkMesh({
   generate,
   ...rest
 }: MarchingCubesChunkProps) {
-  const geometry = usePromise(
+  const {
+    geometry,
+  }: {
+    geometry: BufferGeometry;
+    indices: Uint8Array;
+    vertices: Float32Array;
+  } = usePromise(
     async (
       coordinate: ChunkCoordinate,
       generate: (c: ChunkCoordinate) => Promise<Float32Array>,
     ) => {
       const field = await generate(coordinate);
-      const { geometry } = await generateVoxelGeometry({
+      return await generateVoxelGeometry({
         field,
       });
-      return geometry;
     },
     [coordinate, generate],
   );
 
   const chunkSize = coordinate.size;
+
+  const { vertices, indices } = toCannonStuff(geometry, 0.5 + chunkSize / 2);
+  const [ref] = useTrimesh(() => ({
+    type: 'Static',
+    mass: 0,
+    onCollide: () => console.log('collision'),
+    args: [vertices, indices] as any,
+    position: getChunkPosition(coordinate),
+  }));
+
   const scale = useMemo(
     () =>
       new Vector3(
@@ -57,8 +95,8 @@ function MarchingCubesChunkMesh({
 
   return (
     <mesh
+      ref={ref}
       geometry={geometry}
-      position={getChunkPosition(coordinate)}
       castShadow
       receiveShadow
       scale={scale}

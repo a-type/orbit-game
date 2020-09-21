@@ -10,3 +10,9 @@ context.addEventListener('message', function (ev) {
 
   (context as any).postMessage({ field });
 });
+
+export default class FakeWorker extends Worker {
+  constructor() {
+    super('');
+  }
+}

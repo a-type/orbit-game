@@ -5,7 +5,7 @@ import {
   ChunkCoordinate,
   MarchingCubes,
   MarchingCubesChunk,
-} from './MarchingCubes';
+} from '../meshes/MarchingCubes';
 
 export type TerrainProps = {
   viewPosition: Vector3;

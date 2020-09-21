@@ -10,7 +10,7 @@ const context = self; // eslint-disable-line no-restricted-globals
 context.addEventListener('message', function (ev) {
   const { field } = ev.data as CubeWorkerInput;
   // the raw size of the vector field
-  const size = Math.cbrt(field.length);
+  const size = Math.cbrt(field?.length);
 
   // temp buffers used to polygonize
   const vertexList = new Float32Array(12 * 3);
@@ -516,3 +516,9 @@ context.addEventListener('message', function (ev) {
 
   generate();
 });
+
+export default class FakeWorker extends Worker {
+  constructor() {
+    super('');
+  }
+}

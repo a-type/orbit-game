@@ -1,5 +1,6 @@
 import { BufferGeometry, BufferAttribute } from 'three';
 import { CubeWorkerInput, CubeWorkerResult } from './types';
+import CubesWorker from './cubes.worker';
 
 function concatenate(a: Float32Array, b: Float32Array, length: number) {
   const result = new Float32Array(a.length + length);
@@ -8,12 +9,21 @@ function concatenate(a: Float32Array, b: Float32Array, length: number) {
   return result;
 }
 
+function indices(count: number) {
+  const ind = new Uint16Array(count);
+  for (let i = 0; i < count; i++) {
+    ind[i] = i;
+  }
+  return ind;
+}
+
 export default (chunkData: CubeWorkerInput) => {
-  const worker = new Worker('./cubes.worker', {
-    name: 'CubeWorker',
-    type: 'module',
-  });
-  return new Promise<{ geometry: BufferGeometry }>((resolve, reject) => {
+  const worker: Worker = new CubesWorker();
+  return new Promise<{
+    geometry: BufferGeometry;
+    vertices: Float32Array;
+    indices: Uint16Array;
+  }>((resolve, reject) => {
     worker.addEventListener('message', (ev) => {
       const data = ev.data as CubeWorkerResult;
 
@@ -56,7 +66,11 @@ export default (chunkData: CubeWorkerInput) => {
       // seems to have issues.
       //geometry.computeBoundingSphere();
 
-      resolve({ geometry });
+      resolve({
+        geometry,
+        vertices: positionArray,
+        indices: indices(positionArray?.length),
+      });
     });
 
     worker.postMessage(chunkData);
